@@ -1,0 +1,60 @@
+[TEST @ Epoch=0]
+Accuracy: 10.69 - Loss: 0.016409306921829063
+[TEST @ Epoch=1]
+Accuracy: 24.15 - Loss: 0.015483830168702943
+[TEST @ Epoch=2]
+Accuracy: 28.33 - Loss: 0.015150289797667603
+[TEST @ Epoch=3]
+Accuracy: 28.84 - Loss: 0.015056390560865706
+[TEST @ Epoch=4]
+Accuracy: 31.28 - Loss: 0.014617372087074254
+[TEST @ Epoch=5]
+Accuracy: 32.35 - Loss: 0.014532168605121895
+[TEST @ Epoch=6]
+Accuracy: 32.35 - Loss: 0.014433734136005186
+[TEST @ Epoch=7]
+Accuracy: 33.34 - Loss: 0.01456314250997503
+[TEST @ Epoch=8]
+Accuracy: 33.06 - Loss: 0.014606620131269548
+[TEST @ Epoch=9]
+Accuracy: 35.30 - Loss: 0.014308785324213188
+[TEST @ Epoch=10]
+Accuracy: 35.43 - Loss: 0.01434995109235764
+[TEST @ Epoch=11]
+Accuracy: 35.79 - Loss: 0.014361340873992058
+[TEST @ Epoch=12]
+Accuracy: 36.52 - Loss: 0.014622498875387633
+[TEST @ Epoch=13]
+Accuracy: 36.24 - Loss: 0.01463279409486242
+[TEST @ Epoch=14]
+Accuracy: 36.96 - Loss: 0.014804302280748367
+[TEST @ Epoch=15]
+Accuracy: 37.62 - Loss: 0.014541502003755907
+[TEST @ Epoch=16]
+Accuracy: 38.51 - Loss: 0.014549986661982373
+[TEST @ Epoch=17]
+Accuracy: 38.79 - Loss: 0.014846307929765483
+[TEST @ Epoch=18]
+Accuracy: 38.18 - Loss: 0.015005534888830887
+[TEST @ Epoch=19]
+Accuracy: 39.73 - Loss: 0.014555936704370076
+[TEST @ Epoch=20]
+Accuracy: 40.14 - Loss: 0.014888538048145394
+[TEST @ Epoch=21]
+Accuracy: 40.29 - Loss: 0.01487301604442543
+[TEST @ Epoch=22]
+Accuracy: 40.21 - Loss: 0.015092782814650173
+[TEST @ Epoch=23]
+Accuracy: 39.35 - Loss: 0.015341951043650102
+[TEST @ Epoch=24]
+Accuracy: 39.86 - Loss: 0.015176786603318367
+[TEST @ Epoch=25]
+Accuracy: 39.60 - Loss: 0.015365026293895603
+[TEST @ Epoch=26]
+Accuracy: 39.83 - Loss: 0.015347021102116411
+[TEST @ Epoch=27]
+Accuracy: 39.68 - Loss: 0.015334706303120024
+[TEST @ Epoch=28]
+Accuracy: 40.06 - Loss: 0.015130635723566457
+[TEST @ Epoch=29]
+Accuracy: 40.39 - Loss: 0.015164517163926939
