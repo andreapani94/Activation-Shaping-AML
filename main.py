@@ -47,8 +47,12 @@ def train(model: BaseResNet18, data):
     scaler = torch.cuda.amp.GradScaler(enabled=True)
 
     # Register forward hooks
-    h1 = model.resnet.layer1.register_forward_hook(activation_shaping_hook)
+    hooks = []
+    for layer in model.modules():
+        if isinstance(layer, nn.Conv2d):
+            hooks.append(layer.register_forward_hook(activation_shaping_hook))
 
+    hooks.append(model.resnet.layer1.register_forward_hook(activation_shaping_hook))
     
     # Load checkpoint (if it exists)
     cur_epoch = 0
@@ -102,7 +106,8 @@ def train(model: BaseResNet18, data):
         torch.save(checkpoint, os.path.join('record', CONFIG.experiment_name, 'last.pth'))
 
     # Detach hooks
-    h1.remove()
+    for hook in hooks:
+        hook.remove()
 
 def main():
     

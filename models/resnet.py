@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from torchvision.models import resnet18, ResNet18_Weights
 
+ratio = 1
+
 class BaseResNet18(nn.Module):
     def __init__(self):
         super(BaseResNet18, self).__init__()
@@ -11,8 +13,13 @@ class BaseResNet18(nn.Module):
     def forward(self, x):
         return self.resnet(x)
     
+
 def activation_shaping_hook(module, input, output):
-    print(f'Forward Hook: {torch.sum(output.detach())}')
+    p = torch.full_like(output, ratio)
+    mask = torch.bernoulli(p)
+    mask_bin = (mask > 0).float()
+    output_bin = (output > 0).float()
+    return output_bin * mask_bin
 
 ######################################################
 # TODO: either define the Activation Shaping Module as a nn.Module
