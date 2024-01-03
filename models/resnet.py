@@ -10,6 +10,9 @@ class BaseResNet18(nn.Module):
 
     def forward(self, x):
         return self.resnet(x)
+    
+def activation_shaping_hook(module, input, output):
+    print(f'Forward Hook: {torch.sum(output.detach())}')
 
 ######################################################
 # TODO: either define the Activation Shaping Module as a nn.Module

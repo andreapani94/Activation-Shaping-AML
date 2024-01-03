@@ -13,6 +13,8 @@ from parse_args import parse_arguments
 
 from dataset import PACS
 from models.resnet import BaseResNet18
+# 1. Activation Shaping Module
+from models.resnet import activation_shaping_hook
 
 from globals import CONFIG
 
@@ -37,12 +39,16 @@ def evaluate(model, data):
     logging.info(f'Accuracy: {100 * accuracy:.2f} - Loss: {loss}')
 
 
-def train(model, data):
+def train(model: BaseResNet18, data):
 
     # Create optimizers & schedulers
     optimizer = torch.optim.SGD(model.parameters(), weight_decay=0.0005, momentum=0.9, nesterov=True, lr=0.001)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=int(CONFIG.epochs * 0.8), gamma=0.1)
     scaler = torch.cuda.amp.GradScaler(enabled=True)
+
+    # Register forward hooks
+    h1 = model.resnet.layer1.register_forward_hook(activation_shaping_hook)
+
     
     # Load checkpoint (if it exists)
     cur_epoch = 0
@@ -95,6 +101,8 @@ def train(model, data):
         }
         torch.save(checkpoint, os.path.join('record', CONFIG.experiment_name, 'last.pth'))
 
+    # Detach hooks
+    h1.remove()
 
 def main():
     
