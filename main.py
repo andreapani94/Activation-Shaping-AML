@@ -49,10 +49,10 @@ def train(model: BaseResNet18, data):
     # Register forward hooks
     hooks = []
     for layer in model.modules():
-        if isinstance(layer, nn.Conv2d):
+        if isinstance(layer, nn.ReLU):
             hooks.append(layer.register_forward_hook(activation_shaping_hook))
 
-    hooks.append(model.resnet.layer1.register_forward_hook(activation_shaping_hook)) # why only layer 1?
+    #hooks.append(model.resnet.layer1.register_forward_hook(activation_shaping_hook)) # why only layer 1?
     
     # Load checkpoint (if it exists)
     cur_epoch = 0
