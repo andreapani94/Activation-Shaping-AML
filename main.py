@@ -47,11 +47,13 @@ def train(model: BaseResNet18, data):
     scaler = torch.cuda.amp.GradScaler(enabled=True)
 
     # Register forward hooks
+    i = 0
     if CONFIG.experiment not in ['baseline']:
         hooks = []
         for layer in model.modules():
-            if isinstance(layer, nn.ReLU):
+            if isinstance(layer, nn.ReLU) and i % 4 == 0:
                 hooks.append(layer.register_forward_hook(activation_shaping_hook))
+                i += 1
 
     #hooks.append(model.resnet.layer1.register_forward_hook(activation_shaping_hook)) # why only layer 1?
     
@@ -163,5 +165,3 @@ if __name__ == '__main__':
     torch.use_deterministic_algorithms(mode=True, warn_only=True)
 
     main()
-
-    # comment added in google colab !
