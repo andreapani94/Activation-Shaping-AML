@@ -47,10 +47,11 @@ def train(model: BaseResNet18, data):
     scaler = torch.cuda.amp.GradScaler(enabled=True)
 
     # Register forward hooks
-    hooks = []
-    for layer in model.modules():
-        if isinstance(layer, nn.ReLU):
-            hooks.append(layer.register_forward_hook(activation_shaping_hook))
+    if CONFIG.experiment not in ['baseline']:
+        hooks = []
+        for layer in model.modules():
+            if isinstance(layer, nn.ReLU):
+                hooks.append(layer.register_forward_hook(activation_shaping_hook))
 
     #hooks.append(model.resnet.layer1.register_forward_hook(activation_shaping_hook)) # why only layer 1?
     
@@ -106,8 +107,9 @@ def train(model: BaseResNet18, data):
         torch.save(checkpoint, os.path.join('record', CONFIG.experiment_name, 'last.pth'))
 
     # Detach hooks
-    for hook in hooks:
-        hook.remove()
+    if CONFIG.experiment not in ['baseline']:
+        for hook in hooks:
+            hook.remove()
 
 def main():
     
