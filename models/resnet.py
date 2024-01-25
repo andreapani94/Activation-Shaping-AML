@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
 from torchvision.models import resnet18, ResNet18_Weights
+from globals import CONFIG
 
-ratio = 1
+ratio = CONFIG.M_ratio
 
 class BaseResNet18(nn.Module):
     def __init__(self):
@@ -15,6 +16,7 @@ class BaseResNet18(nn.Module):
     
 
 def activation_shaping_hook(module, input, output):
+    print(f"Activation hook triggered for module: {module.__class__.__name__}")
     p = torch.full_like(output, ratio)
     mask = torch.bernoulli(p)
     mask_bin = (mask > 0).float()
