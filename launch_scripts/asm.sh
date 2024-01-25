@@ -1,6 +1,5 @@
 target_domain=${1}
 experiment_name=${2}
-M_ratio=${3}
 
 
 python main.py \
@@ -10,4 +9,3 @@ python main.py \
 --batch_size=128 \
 --num_workers=5 \
 --grad_accum_steps=1 \
---M_ratio=${M_ratio}

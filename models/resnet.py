@@ -1,9 +1,8 @@
 import torch
 import torch.nn as nn
 from torchvision.models import resnet18, ResNet18_Weights
-from globals import CONFIG
 
-ratio = CONFIG.M_ratio
+ratio = 1
 
 class BaseResNet18(nn.Module):
     def __init__(self):
