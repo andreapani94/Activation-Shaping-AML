@@ -12,7 +12,7 @@ import numpy as np
 from parse_args import parse_arguments
 
 from dataset import PACS
-from models.resnet import BaseResNet18
+from models.resnet import BaseResNet18, DAResNet18
 # 1. Activation Shaping Module
 from models.resnet import activation_shaping_hook
 
@@ -48,14 +48,12 @@ def train(model: BaseResNet18, data):
 
     # Register forward hooks
     i = 0
-    if CONFIG.experiment not in ['baseline']:
+    if CONFIG.experiment in ['random']:
         hooks = []
         for layer in model.modules():
-            if isinstance(layer, nn.ReLU) and i % 4 == 0:
+            if isinstance(layer, nn.Conv2d) and i % 4 == 0:
                 hooks.append(layer.register_forward_hook(activation_shaping_hook))
                 i += 1
-
-    #hooks.append(model.resnet.layer1.register_forward_hook(activation_shaping_hook)) # why only layer 1?
     
     # Load checkpoint (if it exists)
     cur_epoch = 0
@@ -82,8 +80,32 @@ def train(model: BaseResNet18, data):
 
                 ######################################################
                 #elif... TODO: Add here train logic for the other experiments
-
                 ######################################################
+                elif CONFIG.experiment in ['domain_adaptation']:
+                    x_source, y_source, x_target = batch
+                    x_source, y_source, x_target = x_source.to(CONFIG.device), y_source.to(CONFIG.device), \
+                                                    x_target.to(CONFIG.device)
+                    
+                    # record activation maps with a x_target forward pass
+                    i = 0
+                    hooks = []
+                    for layer in model.modules():
+                        if isinstance(layer, nn.Conv2d) and i % 4 == 0:
+                            hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
+                            i += 1
+                    model(x_target)
+                    for hook in hooks:
+                        hook.remove()
+                    # compute model output using only x_source 
+                    i = 0
+                    hooks = []
+                    for layer in model.modules():
+                        if isinstance(layer, nn.Conv2d) and i % 4 == 0:
+                            hooks.append(layer.register_forward_hook(model.asm_source_hook))
+                            i += 1
+                    loss = F.cross_entropy(model(x_source), y_source)
+                    for hook in hooks:
+                        hook.remove()
 
             # Optimization step
             scaler.scale(loss / CONFIG.grad_accum_steps).backward()
@@ -109,7 +131,7 @@ def train(model: BaseResNet18, data):
         torch.save(checkpoint, os.path.join('record', CONFIG.experiment_name, 'last.pth'))
 
     # Detach hooks
-    if CONFIG.experiment not in ['baseline']:
+    if CONFIG.experiment in ['random']:
         for hook in hooks:
             hook.remove()
 
@@ -126,6 +148,9 @@ def main():
     #elif... TODO: Add here model loading for the other experiments (eg. DA and optionally DG)
 
     ######################################################
+        
+    elif CONFIG.experiment in ['domain_adaptation']:
+        model = DAResNet18()
     
     model.to(CONFIG.device)
 
