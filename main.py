@@ -93,7 +93,8 @@ def train(model: BaseResNet18, data):
                         if isinstance(layer, nn.Conv2d) and i % 4 == 0:
                             hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
                             i += 1
-                    model(x_target)
+                    with torch.no_grad():
+                        model(x_target)
                     for hook in hooks:
                         hook.remove()
                     # compute model output using only x_source 
