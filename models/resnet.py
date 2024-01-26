@@ -34,6 +34,7 @@ class DAResNet18(nn.Module):
         self.actmaps_index += 1
         if self.actmaps_index == len(self.actmaps_target):
             self.actmaps_index = 0
+            self.actmaps_target = []
         output_bin = (output > 0).float()
         return output_bin * mask_bin
     
