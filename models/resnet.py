@@ -25,7 +25,7 @@ class DAResNet18(nn.Module):
         return self.resnet(x)
     
     def rec_actmaps_hook(self, module, input, output):
-        self.actmaps_target.append(output.detach())
+        self.actmaps_target.append(output.detach().cpu())
         return output
     
     def asm_source_hook(self, module, input, output):
