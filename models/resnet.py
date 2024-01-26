@@ -21,11 +21,6 @@ class DAResNet18(nn.Module):
         self.actmaps_target = []
         self.actmap_index = 0
 
-        # register forward hook
-        for layer in self.modules():
-            if isinstance(layer, nn.Conv2d) and i % 4 == 0:
-                hooks.append(layer.register_forward_hook(activation_shaping_hook))
-                i += 1
 
     def forward(self, x):
         return self.resnet(x)
