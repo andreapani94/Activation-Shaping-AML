@@ -51,15 +51,15 @@ def load_data():
         if CONFIG.experiment not in ['domain_adaptation']:
             train_dataset = BaseDataset(source_examples, transform=train_transform)
             test_dataset = BaseDataset(target_examples, transform=test_transform)
-        else:
-            train_dataset = DomainAdaptationDataset(source_examples, target_examples, transform=train_transform)
-            test_dataset = BaseDataset(target_examples, transform=test_transform)
 
     ######################################################
     #elif... TODO: Add here how to create the Dataset object for the other experiments
 
 
     ######################################################
+        else:
+            train_dataset = DomainAdaptationDataset(source_examples, target_examples, transform=train_transform)
+            test_dataset = BaseDataset(target_examples, transform=test_transform)
 
     # Dataloaders
     train_loader = SeededDataLoader(
