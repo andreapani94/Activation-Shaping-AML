@@ -29,7 +29,8 @@ class DAResNet18(nn.Module):
             for layer in self.modules():
                 if isinstance(layer, nn.ReLU):
                     hooks.append(layer.register_forward_hook(self.rec_actmaps_hook))
-            self.resnet(x_target)
+            with torch.no_grad:
+                self.resnet(x_target)
             for hook in hooks:
                 hook.remove()
         return self.resnet(x_source)
