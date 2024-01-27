@@ -8,3 +8,4 @@ python main.py \
 --batch_size=128 \
 --num_workers=5 \
 --grad_accum_steps=1 \
+--epochs=1 \

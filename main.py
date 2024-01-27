@@ -87,26 +87,16 @@ def train(model: BaseResNet18, data):
                                                     x_target.to(CONFIG.device)
                     
                     # record activation maps with a x_target forward pass
-                    i = 0
                     hooks = []
                     for layer in model.modules():
-                        if isinstance(layer, nn.Conv2d) and i % 4 == 0:
+                        if isinstance(layer, nn.ReLU):
                             hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
-                            i += 1
                     with torch.no_grad():
                         model(x_target)
                     for hook in hooks:
                         hook.remove()
-                    # compute model output using only x_source 
-                    i = 0
-                    hooks = []
-                    for layer in model.modules():
-                        if isinstance(layer, nn.Conv2d) and i % 4 == 0:
-                            hooks.append(layer.register_forward_hook(model.asm_source_hook))
-                            i += 1
+                    # compute model output using only x_source
                     loss = F.cross_entropy(model(x_source), y_source)
-                    for hook in hooks:
-                        hook.remove()
 
             # Optimization step
             scaler.scale(loss / CONFIG.grad_accum_steps).backward()

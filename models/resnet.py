@@ -19,24 +19,26 @@ class DAResNet18(nn.Module):
         self.resnet = resnet18(weights=ResNet18_Weights)
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, 7)
         self.actmaps_target = []
-        self.actmaps_index = 0
 
     def forward(self, x):
         return self.resnet(x)
     
     def rec_actmaps_hook(self, module, input, output):
-        self.actmaps_target.append(output.clone())
+        print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
+        print(f"actmaps length: {len(self.actmaps_target)}")
+        self.actmaps_target.append(output.detach())
         return output
     
     def asm_source_hook(self, module, input, output):
-        mask = self.actmaps_target[self.actmaps_index]
+        """ mask = self.actmaps_target[self.actmaps_index]
         mask_bin = (mask > 0).float()
         self.actmaps_index += 1
         if self.actmaps_index == len(self.actmaps_target):
             self.actmaps_index = 0
             self.actmaps_target = []
         output_bin = (output > 0).float()
-        return output_bin * mask_bin
+        return output_bin * mask_bin """
+        pass
     
 
 def activation_shaping_hook(module, input, output):
