@@ -106,6 +106,13 @@ def train(model: BaseResNet18, data):
                 optimizer.zero_grad(set_to_none=True)
                 scaler.update()
 
+            if batch_idx == 0:
+                break
+
+        # debug
+        if epoch == 0:
+            break      
+
         scheduler.step()
         
         # Test current epoch
@@ -121,6 +128,8 @@ def train(model: BaseResNet18, data):
         }
         torch.save(checkpoint, os.path.join('record', CONFIG.experiment_name, 'last.pth'))
 
+    
+    
     # Detach hooks
     if CONFIG.experiment in ['random']:
         for hook in hooks:
