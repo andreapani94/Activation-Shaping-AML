@@ -18,38 +18,34 @@ class DAResNet18(nn.Module):
         super(DAResNet18, self).__init__()
         self.resnet = resnet18(weights=ResNet18_Weights)
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, 7)
-        self.actmaps_target = []
+        self.actmaps_target = {}
+        self.forward_turn = 'target'
 
     def forward(self, x_source, x_target=None):
         # unregister other forward hooks
         # register forward hooks
         # unregister forward hooks
         if x_target is not None:
-            hooks = []
-            for layer in self.modules():
-                if isinstance(layer, nn.ReLU):
-                    hooks.append(layer.register_forward_hook(self.rec_actmaps_hook))
+            self.forward_turn = 'target'
             self.resnet(x_target)
-            for hook in hooks:
-                hook.remove()
+        self.forward_turn = 'source'
         return self.resnet(x_source)
     
     def rec_actmaps_hook(self, module, input, output):
-        print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
-        print(f"actmaps length: {len(self.actmaps_target)}")
-        self.actmaps_target.append(output.detach())
+        #print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
+        #print(f"actmaps length: {len(self.actmaps_target)}")
+        if self.forward_turn == 'target':
+            self.actmaps_target[repr(module)] = output.detach()
         return output
     
     def asm_source_hook(self, module, input, output):
-        """ mask = self.actmaps_target[self.actmaps_index]
-        mask_bin = (mask > 0).float()
-        self.actmaps_index += 1
-        if self.actmaps_index == len(self.actmaps_target):
-            self.actmaps_index = 0
-            self.actmaps_target = []
-        output_bin = (output > 0).float()
-        return output_bin * mask_bin """
-        pass
+        if self.forward_turn == 'source':
+            mask = self.actmaps_target[repr(module)]
+            mask_bin = (mask > 0).float()
+            output_bin = (output > 0).float()
+            return output_bin * mask_bin
+        else : 
+            return output
     
 
 def activation_shaping_hook(module, input, output):

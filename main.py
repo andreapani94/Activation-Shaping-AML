@@ -87,8 +87,14 @@ def train(model: BaseResNet18, data):
                                                     x_target.to(CONFIG.device)
                     
                     model.actmaps_target.clear()
-                    
+                    hooks = []
+                    for layer in model.modules():
+                        if isinstance(layer, nn.ReLU):
+                            hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
+                            hooks.append(layer.register_forward_hook(model.asm_source_hook))
                     loss = F.cross_entropy(model(x_source, x_target), y_source)
+                    for hook in hooks:
+                        hook.remove()
 
             # Optimization step
             scaler.scale(loss / CONFIG.grad_accum_steps).backward()
