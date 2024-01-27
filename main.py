@@ -88,10 +88,12 @@ def train(model: BaseResNet18, data):
                     
                     model.actmaps_target.clear()
                     hooks = []
+                    i = 0
                     for layer in model.modules():
-                        if isinstance(layer, nn.ReLU):
+                        if isinstance(layer, nn.ReLU) and i % 4 == 0:
                             hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
                             hooks.append(layer.register_forward_hook(model.asm_source_hook))
+                            i += 1
                     loss = F.cross_entropy(model(x_source, x_target), y_source)
                     for hook in hooks:
                         hook.remove()
