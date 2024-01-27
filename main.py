@@ -87,13 +87,14 @@ def train(model: BaseResNet18, data):
                                                     x_target.to(CONFIG.device)
                     
                     # record activation maps with a x_target forward pass
-                    
+                    model.actmaps_target.clear()
                     hooks = []
                     for layer in model.modules():
                         if isinstance(layer, nn.ReLU):
                             hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
                     with torch.no_grad():
-                        model(x_target)
+                        _ = model(x_target)
+                    optimizer.zero_grad(set_to_none=True)
                     for hook in hooks:
                         hook.remove()
                     # compute model output using only x_source
