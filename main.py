@@ -87,6 +87,7 @@ def train(model: BaseResNet18, data):
                                                     x_target.to(CONFIG.device)
                     
                     # record activation maps with a x_target forward pass
+                    
                     hooks = []
                     for layer in model.modules():
                         if isinstance(layer, nn.ReLU):
@@ -106,12 +107,12 @@ def train(model: BaseResNet18, data):
                 optimizer.zero_grad(set_to_none=True)
                 scaler.update()
 
-            if batch_idx == 0:
-                break
+            """ if batch_idx == 0:
+                break """
 
         # debug
-        if epoch == 0:
-            break      
+        """ if epoch == 0:
+            break    """   
 
         scheduler.step()
         
