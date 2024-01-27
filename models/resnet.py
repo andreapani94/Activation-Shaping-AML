@@ -20,8 +20,18 @@ class DAResNet18(nn.Module):
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, 7)
         self.actmaps_target = []
 
-    def forward(self, x):
-        return self.resnet(x)
+    def forward(self, x_source, x_target):
+        # unregister other forward hooks
+        # register forward hooks
+        # unregister forward hooks
+        hooks = []
+        for layer in self.modules():
+            if isinstance(layer, nn.ReLU):
+                hooks.append(layer.register_forward_hook(self.rec_actmaps_hook))
+        self.resnet(x_target)
+        for hook in hooks:
+            hook.remove()
+        return self.resnet(x_source)
     
     def rec_actmaps_hook(self, module, input, output):
         print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
