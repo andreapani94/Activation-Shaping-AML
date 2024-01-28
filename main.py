@@ -92,8 +92,9 @@ def train(model: BaseResNet18, data):
                     x_source, y_source, x_target = batch
                     x_source, y_source, x_target = x_source.to(CONFIG.device), y_source.to(CONFIG.device), \
                                                     x_target.to(CONFIG.device)
-                    
+                    print('\n FORWARD')
                     loss = F.cross_entropy(model(x_source, x_target), y_source)
+                    print('\n END')
 
             # Optimization step
             scaler.scale(loss / CONFIG.grad_accum_steps).backward()
