@@ -26,7 +26,7 @@ class DAResNet18(nn.Module):
         # register forward hooks
         # unregister forward hooks
         if x_target is not None:
-            self.forward_turn == 'target'
+            self.forward_turn = 'target'
             self.resnet(x_target)
         self.forward_turn = 'source'
         return self.resnet(x_source)
