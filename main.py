@@ -54,6 +54,13 @@ def train(model: BaseResNet18, data):
             if isinstance(layer, nn.Conv2d) and i % 4 == 0:
                 hooks.append(layer.register_forward_hook(activation_shaping_hook))
                 i += 1
+    elif CONFIG.experiment in ['domain_adaptation']:
+        hooks = []
+        for layer in model.modules():
+            if isinstance(layer, nn.Conv2d) :
+                hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
+                hooks.append(layer.register_forward_hook(model.asm_source_hook))
+                i += 1
     
     # Load checkpoint (if it exists)
     cur_epoch = 0
@@ -86,17 +93,7 @@ def train(model: BaseResNet18, data):
                     x_source, y_source, x_target = x_source.to(CONFIG.device), y_source.to(CONFIG.device), \
                                                     x_target.to(CONFIG.device)
                     
-                    model.actmaps_target.clear()
-                    hooks = []
-                    i = 0
-                    for layer in model.modules():
-                        if isinstance(layer, nn.ReLU) and i % 4 == 0:
-                            hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
-                            hooks.append(layer.register_forward_hook(model.asm_source_hook))
-                            i += 1
                     loss = F.cross_entropy(model(x_source, x_target), y_source)
-                    for hook in hooks:
-                        hook.remove()
 
             # Optimization step
             scaler.scale(loss / CONFIG.grad_accum_steps).backward()
@@ -131,7 +128,7 @@ def train(model: BaseResNet18, data):
     
     
     # Detach hooks
-    if CONFIG.experiment in ['random']:
+    if CONFIG.experiment in ['random', 'domain_adaptation']:
         for hook in hooks:
             hook.remove()
 

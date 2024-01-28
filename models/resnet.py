@@ -19,39 +19,29 @@ class DAResNet18(nn.Module):
         self.resnet = resnet18(weights=ResNet18_Weights)
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, 7)
         self.actmaps_target = []
-        self.forward_turn = 'target'
-        self.forward_index = 0
 
     def forward(self, x_source, x_target=None):
         # unregister other forward hooks
         # register forward hooks
         # unregister forward hooks
         if x_target is not None:
-            self.forward_turn = 'target'
-            self.forward_index = 0
             self.resnet(x_target)
-        self.forward_turn = 'source'
-        self.forward_index = 0
         return self.resnet(x_source)
     
     def rec_actmaps_hook(self, module, input, output):
-        #print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
+        print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
         #print(f"actmaps length: {len(self.actmaps_target)}")
-        if self.forward_turn == 'target':
-            self.actmaps_target[self.forward_index] = output.detach()
-            self.forward_index += 1
+        #self.actmaps_target.append(output.detach())
         return output
     
     def asm_source_hook(self, module, input, output):
-        if self.forward_turn == 'source':
-            mask = self.actmaps_target[self.forward_index]
-            self.forward_index += 1
-            mask_bin = (mask > 0).float()
-            output_bin = (output > 0).float()
-            return output_bin * mask_bin
-        else : 
+            print(f"asm_source_hook triggered for module: {module.__class__.__name__}")
+            #print(f"actmaps length: {len(self.actmaps_target)}")
+            #mask = self.actmaps_target.pop(0)
+            #mask_bin = (mask > 0).float()
+            #output_bin = (output > 0).float()
+            #return output_bin * mask_bin
             return output
-    
 
 def activation_shaping_hook(module, input, output):
     #print(f"Activation hook triggered for module: {module.__class__.__name__}")
