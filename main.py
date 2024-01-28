@@ -45,22 +45,6 @@ def train(model: BaseResNet18, data):
     optimizer = torch.optim.SGD(model.parameters(), weight_decay=0.0005, momentum=0.9, nesterov=True, lr=0.001)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=int(CONFIG.epochs * 0.8), gamma=0.1)
     scaler = torch.cuda.amp.GradScaler(enabled=True)
-
-    # Register forward hooks
-    i = 0
-    if CONFIG.experiment in ['random']:
-        hooks = []
-        for layer in model.modules():
-            if isinstance(layer, nn.Conv2d) and i % 4 == 0:
-                hooks.append(layer.register_forward_hook(activation_shaping_hook))
-                i += 1
-    elif CONFIG.experiment in ['domain_adaptation']:
-        hooks = []
-        for layer in model.modules():
-            if isinstance(layer, nn.ReLU):
-                hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
-                hooks.append(layer.register_forward_hook(model.asm_source_hook))
-                i += 1
     
     # Load checkpoint (if it exists)
     cur_epoch = 0
@@ -70,10 +54,27 @@ def train(model: BaseResNet18, data):
         optimizer.load_state_dict(checkpoint['optimizer'])
         scheduler.load_state_dict(checkpoint['scheduler'])
         model.load_state_dict(checkpoint['model'])
+
     
     # Optimization loop
     for epoch in range(cur_epoch, CONFIG.epochs):
         model.train()
+
+        # Register forward hooks
+        i = 0
+        if CONFIG.experiment in ['random']:
+            hooks = []
+            for layer in model.modules():
+                if isinstance(layer, nn.Conv2d) and i % 4 == 0:
+                    hooks.append(layer.register_forward_hook(activation_shaping_hook))
+                    i += 1
+        elif CONFIG.experiment in ['domain_adaptation']:
+            hooks = []
+            for layer in model.modules():
+                if isinstance(layer, nn.ReLU):
+                    hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
+                    hooks.append(layer.register_forward_hook(model.asm_source_hook))
+                    i += 1
         
         for batch_idx, batch in enumerate(tqdm(data['train'])):
             
@@ -103,13 +104,11 @@ def train(model: BaseResNet18, data):
                 scaler.step(optimizer)
                 optimizer.zero_grad(set_to_none=True)
                 scaler.update()
-
-            """ if batch_idx == 0:
-                break """
-
-        # debug
-        """ if epoch == 0:
-            break    """   
+        
+        # Detach hooks
+        if CONFIG.experiment in ['random', 'domain_adaptation']:
+            for hook in hooks:
+                hook.remove()
 
         scheduler.step()
         
@@ -126,12 +125,6 @@ def train(model: BaseResNet18, data):
         }
         torch.save(checkpoint, os.path.join('record', CONFIG.experiment_name, 'last.pth'))
 
-    
-    
-    # Detach hooks
-    if CONFIG.experiment in ['random', 'domain_adaptation']:
-        for hook in hooks:
-            hook.remove()
 
 def main():
     
