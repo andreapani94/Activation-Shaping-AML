@@ -57,7 +57,7 @@ def train(model: BaseResNet18, data):
     elif CONFIG.experiment in ['domain_adaptation']:
         hooks = []
         for layer in model.modules():
-            if isinstance(layer, nn.Conv2d) :
+            if isinstance(layer, nn.ReLU):
                 hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
                 hooks.append(layer.register_forward_hook(model.asm_source_hook))
                 i += 1

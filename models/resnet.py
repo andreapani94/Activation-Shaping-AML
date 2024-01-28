@@ -19,23 +19,28 @@ class DAResNet18(nn.Module):
         self.resnet = resnet18(weights=ResNet18_Weights)
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, 7)
         self.actmaps_target = []
+        self.forward_turn = 'target'
 
     def forward(self, x_source, x_target=None):
         # unregister other forward hooks
         # register forward hooks
         # unregister forward hooks
         if x_target is not None:
+            self.forward_turn == 'target'
             self.resnet(x_target)
+        self.forward_turn = 'source'
         return self.resnet(x_source)
     
     def rec_actmaps_hook(self, module, input, output):
-        print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
+        if self.forward_turn == 'target':
+            print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
         #print(f"actmaps length: {len(self.actmaps_target)}")
         #self.actmaps_target.append(output.detach())
         return output
     
     def asm_source_hook(self, module, input, output):
-            print(f"asm_source_hook triggered for module: {module.__class__.__name__}")
+            if self.forward_turn == 'source':
+                print(f"asm_source_hook triggered for module: {module.__class__.__name__}")
             #print(f"actmaps length: {len(self.actmaps_target)}")
             #mask = self.actmaps_target.pop(0)
             #mask_bin = (mask > 0).float()
