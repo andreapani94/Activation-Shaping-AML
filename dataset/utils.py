@@ -46,6 +46,24 @@ class DomainAdaptationDataset(Dataset):
         x_target = self.T(x_target).to(CONFIG.dtype)
         return x_source, y_source, x_target
     
+class DomainGeneralizationDataset(Dataset):
+    def __init__(self, examples, transform):
+        self.examples = examples
+        self.T = transform
+
+    def __len__(self):
+        return len(self.examples)
+    
+    def __getitem__(self, index):
+       (x1, y1), (x2, y2), (x3, y3) = self.examples[index]
+       x1, x2, x3 = Image.open(x1).convert('RGB'), Image.open(x2).convert('RGB'), \
+                        Image.open(x3).convert('RGB')
+       x1, x2, x3 = self.T(x1).to(CONFIG.dtype), self.T(x2).to(CONFIG.dtype), \
+                        self.T(x3).to(CONFIG.dtype)
+       y1, y2, y3 = torch.tensor(y1).long(), torch.tensor(y2).long(), torch.tensor(y3).long()
+       return (x1, y1), (x2, y2), (x3, y3)
+       
+    
 
 ######################################################
 # TODO: modify 'BaseDataset' for the Domain Adaptation setting.

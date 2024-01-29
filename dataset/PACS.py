@@ -48,7 +48,7 @@ def load_data():
             path, label = line[0].split('/')[1:], int(line[1])
             target_examples.append((os.path.join(CONFIG.dataset_args['root'], *path), label))
 
-        if CONFIG.experiment not in ['domain_adaptation']:
+        if CONFIG.experiment in ['baseline', 'random']:
             train_dataset = BaseDataset(source_examples, transform=train_transform)
             test_dataset = BaseDataset(target_examples, transform=test_transform)
 
@@ -57,9 +57,13 @@ def load_data():
 
 
     ######################################################
-        else:
+        elif CONFIG.experiment in ['domain_adaptation']:
             train_dataset = DomainAdaptationDataset(source_examples, target_examples, transform=train_transform)
             test_dataset = BaseDataset(target_examples, transform=test_transform)
+
+    elif CONFIG.experiment in ['domain_generalization']:
+        print(CONFIG.dataset_args['source_domains'])
+        
 
     # Dataloaders
     train_loader = SeededDataLoader(
