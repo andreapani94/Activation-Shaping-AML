@@ -4,6 +4,24 @@ from torchvision.models import resnet18, ResNet18_Weights
 
 ratio = 1
 
+def register_forward_hooks(model, hook, layer_type, skip_step=None):
+    hook_handles = []
+    layer_count = 0
+    for layer in model.modules():
+        if isinstance(layer, layer_type):
+            if skip_step is None:
+                hook_handles.append(layer.register_forward_hook(hook))
+            else:
+                if layer_count % skip_step == 0:
+                    hook_handles.append(layer.register_forward_hook(hook))
+                layer_count += 1
+    print(f'Registered {len(hook_handles)} forward hooks to {layer_type}')
+    return hook_handles
+
+def remove_forward_hooks(hook_handles):
+    for hook in hook_handles:
+        hook.remove()
+
 class BaseResNet18(nn.Module):
     def __init__(self):
         super(BaseResNet18, self).__init__()
@@ -48,7 +66,7 @@ class DAResNet18(nn.Module):
                 output = output_bin * mask_bin
             return output
 
-def activation_shaping_hook(module, input, output):
+def asm_hook(module, input, output):
     #print(f"Activation hook triggered for module: {module.__class__.__name__}")
     p = torch.full_like(output, ratio)
     mask = torch.bernoulli(p)

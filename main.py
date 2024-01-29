@@ -14,7 +14,8 @@ from parse_args import parse_arguments
 from dataset import PACS
 from models.resnet import BaseResNet18, DAResNet18
 # 1. Activation Shaping Module
-from models.resnet import activation_shaping_hook
+from models.resnet import asm_hook
+from models.resnet import register_forward_hooks, remove_forward_hooks
 
 from globals import CONFIG
 
@@ -60,23 +61,20 @@ def train(model: BaseResNet18, data):
     for epoch in range(cur_epoch, CONFIG.epochs):
         model.train()
 
+        print(f'EPOCH: {epoch}')
+
         # Register forward hooks
-        i = 0
         if CONFIG.experiment in ['random']:
-            hooks = []
-            for layer in model.modules():
-                if isinstance(layer, nn.Conv2d) and i % 4 == 0:
-                    hooks.append(layer.register_forward_hook(activation_shaping_hook))
-                    i += 1
+            hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU)   
         elif CONFIG.experiment in ['domain_adaptation']:
             hooks = []
+            i = 0
             for layer in model.modules():
                 if isinstance(layer, nn.ReLU):
                     if i % 4 == 0:
                         hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
                         hooks.append(layer.register_forward_hook(model.asm_source_hook))
-                    else:
-                        i += 1
+                    i += 1
         
         for batch_idx, batch in enumerate(tqdm(data['train'])):
             
@@ -95,9 +93,7 @@ def train(model: BaseResNet18, data):
                     x_source, y_source, x_target = batch
                     x_source, y_source, x_target = x_source.to(CONFIG.device), y_source.to(CONFIG.device), \
                                                     x_target.to(CONFIG.device)
-                    print('\n FORWARD')
                     loss = F.cross_entropy(model(x_source, x_target), y_source)
-                    print('\n END')
 
             # Optimization step
             scaler.scale(loss / CONFIG.grad_accum_steps).backward()
@@ -109,8 +105,7 @@ def train(model: BaseResNet18, data):
         
         # Detach hooks
         if CONFIG.experiment in ['random', 'domain_adaptation']:
-            for hook in hooks:
-                hook.remove()
+            remove_forward_hooks(hook_handles)
 
         scheduler.step()
         

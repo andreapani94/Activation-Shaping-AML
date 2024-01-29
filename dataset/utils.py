@@ -9,6 +9,7 @@ from PIL import Image
 
 from globals import CONFIG
 
+
 class BaseDataset(Dataset):
     def __init__(self, examples, transform):
         self.examples = examples
