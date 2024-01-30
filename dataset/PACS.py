@@ -64,6 +64,7 @@ def load_data():
     elif CONFIG.experiment in ['domain_generalization']:
         print(CONFIG.dataset_args['source_domains'])
         
+        
 
     # Dataloaders
     train_loader = SeededDataLoader(
