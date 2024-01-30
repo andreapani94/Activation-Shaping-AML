@@ -56,7 +56,14 @@ def train(model: BaseResNet18, data):
         scheduler.load_state_dict(checkpoint['scheduler'])
         model.load_state_dict(checkpoint['model'])
 
-    # Register forward hooks
+    
+    # Optimization loop
+    for epoch in range(cur_epoch, CONFIG.epochs):
+        model.train()
+
+        print(f'EPOCH: {epoch}')
+
+        # Register forward hooks
         if CONFIG.experiment in ['random']:
             hook_handles = []
             #hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU) 
@@ -70,13 +77,6 @@ def train(model: BaseResNet18, data):
                         hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
                         hooks.append(layer.register_forward_hook(model.asm_source_hook))
                     i += 1
-
-    
-    # Optimization loop
-    for epoch in range(cur_epoch, CONFIG.epochs):
-        model.train()
-
-        print(f'EPOCH: {epoch}')
         
         for batch_idx, batch in enumerate(tqdm(data['train'])):
             
@@ -120,9 +120,9 @@ def train(model: BaseResNet18, data):
         }
         torch.save(checkpoint, os.path.join('record', CONFIG.experiment_name, 'last.pth'))
 
-    # Detach hooks
-    if CONFIG.experiment in ['random', 'domain_adaptation']:
-        remove_forward_hooks(hook_handles)
+        # Detach hooks
+        if CONFIG.experiment in ['random', 'domain_adaptation']:
+            remove_forward_hooks(hook_handles)
 
 
 def main():
