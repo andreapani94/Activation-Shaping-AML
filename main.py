@@ -67,16 +67,11 @@ def train(model: BaseResNet18, data):
         if CONFIG.experiment in ['random']:
             hook_handles = []
             #hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU) 
-            hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(asm_hook))  
+            hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(asm_hook))  
         elif CONFIG.experiment in ['domain_adaptation']:
-            hooks = []
-            i = 0
-            for layer in model.modules():
-                if isinstance(layer, nn.ReLU):
-                    if i % 4 == 0:
-                        hooks.append(layer.register_forward_hook(model.rec_actmaps_hook))
-                        hooks.append(layer.register_forward_hook(model.asm_source_hook))
-                    i += 1
+            hook_handles = []
+            hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(model.rec_actmaps_hook))
+            hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(model.asm_source_hook))
         
         for batch_idx, batch in enumerate(tqdm(data['train'])):
             
