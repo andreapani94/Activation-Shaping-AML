@@ -101,6 +101,10 @@ def train(model: BaseResNet18, data):
                 scaler.update()
 
         scheduler.step()
+
+        # Detach hooks
+        if CONFIG.experiment in ['domain_adaptation']:
+            remove_forward_hooks(hook_handles)
         
         # Test current epoch
         logging.info(f'[TEST @ Epoch={epoch}]')
@@ -116,7 +120,7 @@ def train(model: BaseResNet18, data):
         torch.save(checkpoint, os.path.join('record', CONFIG.experiment_name, 'last.pth'))
 
         # Detach hooks
-        if CONFIG.experiment in ['random', 'domain_adaptation']:
+        if CONFIG.experiment in ['random']:
             remove_forward_hooks(hook_handles)
 
 
