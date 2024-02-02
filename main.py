@@ -12,7 +12,7 @@ import numpy as np
 from parse_args import parse_arguments
 
 from dataset import PACS
-from models.resnet import BaseResNet18, DAResNet18
+from models.resnet import BaseResNet18, DAResNet18, DGResNet18
 # 1. Activation Shaping Module
 from models.resnet import asm_hook
 from models.resnet import register_forward_hooks, remove_forward_hooks
@@ -149,6 +149,8 @@ def main():
         
     elif CONFIG.experiment in ['domain_adaptation']:
         model = DAResNet18()
+    elif CONFIG.experiment in ['domain_generalization']:
+        model = DGResNet18()
     
     model.to(CONFIG.device)
 
