@@ -27,7 +27,7 @@ def load_domain(domain_path: str):
         lines = f.readlines()
         for line in lines:
             line = line.strip().split()
-            path, label = line[0].split('/')[1:], int([line[1]])
+            path, label = line[0].split('/')[1:], int(line[1])
             domain_examples.append((os.path.join(CONFIG.dataset_args['root'], *path), label))
     
     return domain_examples
