@@ -6,6 +6,8 @@ from dataset.utils import SeededDataLoader
 
 from globals import CONFIG
 
+import numpy as np
+
 def get_transform(size, mean, std, preprocess):
     transform = []
     if preprocess:
@@ -29,6 +31,11 @@ def load_domain(domain_path: str):
             domain_examples.append((os.path.join(CONFIG.dataset_args['root'], *path), label))
     
     return domain_examples
+
+def oversample(data: list, N: int):
+    while (len(data) < N):
+        index = np.random.randint(0, len(data))
+        data.append(data[index]) 
 
 
 def load_data():
@@ -75,12 +82,34 @@ def load_data():
 
     elif CONFIG.experiment in ['domain_generalization']:
         source_domains_examples = []
+        source_examples, target_examples = [], []
         print(CONFIG.dataset_args['source_domains'])
-        #CONFIG.dataset_args['source_domains'] =  CONFIG.dataset_args['source_domains'].split(',')
+        CONFIG.dataset_args['source_domains'] =  CONFIG.dataset_args['source_domains'].split()
 
         # Load source domains
         for source_domain_path in CONFIG.dataset_args['source_domains']:
-            source_domains_examples.append(source_domain_path)
+            source_domains_examples.append(load_domain(source_domain_path))
+
+        for label in range(2):
+            d1, d2, d3 = np.array(source_domains_examples[0]), np.array(source_domains_examples[1]), \
+                            np.array(source_domains_examples[2])
+            mask1, mask2, mask3 = (d1[:, 1] == label), (d2[:, 1] == label), (d3[:, 1] == label)
+            d1, d2, d3 = d1[mask1].tolist(), d2[mask2].tolist(), d3[mask3].tolist()
+            num_samples = np.max([len(d1), len(d2), len(d3)])
+            for d in [d1, d2, d3]:
+                if len(d) < num_samples:
+                    oversample(d, num_samples)
+            for example in zip(d1, d2, d3):
+                source_examples.append(example)
+            
+        print(source_examples)
+
+
+
+
+        
+                                           
+                                        
 
         
         
