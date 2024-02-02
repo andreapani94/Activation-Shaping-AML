@@ -18,6 +18,18 @@ def get_transform(size, mean, std, preprocess):
     transform.append(T.Normalize(mean, std))
     return T.Compose(transform)
 
+def load_domain(domain_path: str):
+    domain_examples = []
+
+    with open(os.path.join(CONFIG.dataset_args['root'], f'{domain_path}.txt'), 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            line = line.strip().split()
+            path, label = line[0].split('/')[1:], int([line[1]])
+            domain_examples.append((os.path.join(CONFIG.dataset_args['root'], *path), label))
+    
+    return domain_examples
+
 
 def load_data():
     CONFIG.num_classes = 7
@@ -62,7 +74,14 @@ def load_data():
             test_dataset = BaseDataset(target_examples, transform=test_transform)
 
     elif CONFIG.experiment in ['domain_generalization']:
+        source_domains_examples = []
         print(CONFIG.dataset_args['source_domains'])
+        #CONFIG.dataset_args['source_domains'] =  CONFIG.dataset_args['source_domains'].split(',')
+
+        # Load source domains
+        for source_domain_path in CONFIG.dataset_args['source_domains']:
+            source_domains_examples.append(source_domain_path)
+
         
         
 
