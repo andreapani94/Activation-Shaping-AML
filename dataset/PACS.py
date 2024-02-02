@@ -100,7 +100,9 @@ def load_data():
                 if len(d) < num_samples:
                     oversample(d, num_samples)
             for example in zip(d1, d2, d3):
-                example = (example[0], int(example[1])) # since numpy converted the label to string
+                # convert labels again to ints after numpy processing
+                for path, label in example:
+                    label = int(label)
                 source_examples.append(example)
             
         # Load target examples
