@@ -101,8 +101,8 @@ def load_data():
                     oversample(d, num_samples)
             for example in zip(d1, d2, d3):
                 # convert labels again to ints after numpy processing
-                for path, label in example:
-                    label = int(label)
+                for i in range(len(example)):
+                    example[i][1] = int(example[i][1])
                 source_examples.append(example)
             
         # Load target examples
