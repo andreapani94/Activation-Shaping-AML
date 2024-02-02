@@ -102,7 +102,8 @@ def load_data():
             for example in zip(d1, d2, d3):
                 source_examples.append(example)
             
-        print(source_examples)
+        print(source_examples[0])
+        print(source_examples[-1])
 
 
 
