@@ -92,6 +92,15 @@ def train(model: BaseResNet18, data):
                                                     x_target.to(CONFIG.device)
                     loss = F.cross_entropy(model(x_source, x_target), y_source)
 
+                elif CONFIG.experiment in ['domain_generalization']:
+                    (x1, y1), (x2, y2), (x3, y3) = batch
+                    x1, y1 = x1.to(CONFIG.device), y1.to(CONFIG.device)
+                    x2, y2 = x2.to(CONFIG.device), y2.to(CONFIG.device)
+                    x3, y3 = x3.to(CONFIG.device), y3.to(CONFIG.device)
+                    x = torch.concat(x1, x2, x3)
+                    y = torch.concat(y1, y2, y3)
+                    loss = F.cross_entropy(model(x), y)
+
             # Optimization step
             scaler.scale(loss / CONFIG.grad_accum_steps).backward()
 

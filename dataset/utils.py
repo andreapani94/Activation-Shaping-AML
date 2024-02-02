@@ -56,6 +56,7 @@ class DomainGeneralizationDataset(Dataset):
     
     def __getitem__(self, index):
        (x1, y1), (x2, y2), (x3, y3) = self.examples[index]
+       assert(y1 == y2 == y3)
        x1, x2, x3 = Image.open(x1).convert('RGB'), Image.open(x2).convert('RGB'), \
                         Image.open(x3).convert('RGB')
        x1, x2, x3 = self.T(x1).to(CONFIG.dtype), self.T(x2).to(CONFIG.dtype), \

@@ -22,6 +22,14 @@ def remove_forward_hooks(hook_handles):
     for hook in hook_handles:
         hook.remove()
 
+def asm_hook(module, input, output):
+    #print(f"Activation hook triggered for module: {module.__class__.__name__}")
+    p = torch.full_like(output, ratio)
+    mask = torch.bernoulli(p)
+    mask_bin = (mask > 0).float()
+    output_bin = (output > 0).float()
+    return output_bin * mask_bin
+
 class BaseResNet18(nn.Module):
     def __init__(self):
         super(BaseResNet18, self).__init__()
@@ -64,14 +72,40 @@ class DAResNet18(nn.Module):
                 output_bin = (output > 0).float()
                 output = output_bin * mask_bin
                 return output
+            
+class DGResNet18(nn.Module):
+    def __init__(self):
+        super(DGResNet18, self).__init__()
+        self.actmaps1 = []
+        self.actmaps2 = []
+        self.actmaps3 = []
+        self.rec_turn = 1
 
-def asm_hook(module, input, output):
-    #print(f"Activation hook triggered for module: {module.__class__.__name__}")
-    p = torch.full_like(output, ratio)
-    mask = torch.bernoulli(p)
-    mask_bin = (mask > 0).float()
-    output_bin = (output > 0).float()
-    return output_bin * mask_bin
+    def forward(self, x):
+        return self.resnet(x)
+
+    def rec_actmaps(self, x1, x2, x3):
+        self.rec_turn = 1
+        self.resnet(x1)
+        self.rec_turn = 2
+        self.resnet(x2)
+        self.rec_turn = 3
+        self.resnet(x3)
+
+    def rec_actmaps_hook(self, module, input, output):
+        if self.rec_turn == 1:
+            self.actmaps1.append(output.detach())
+        elif self.rec_turn == 2:
+            self.actmaps2.append(output.detach())
+        elif self.rec_turn == 3:
+            self.actmaps3.append(output.detach())
+    
+    def asm_hook(self, module, input, output):
+        mask1 = (self.actmaps1.pop(0) > 0).float()
+        mask2 = (self.actmaps2.pop(0) > 0).float()
+        mask3 = (self.actmaps3.pop(0) > 0).float()
+        output_bin = (output > 0).float()
+        return mask1 * mask2 * mask3 * output_bin
 
 
 
