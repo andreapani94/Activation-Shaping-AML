@@ -94,7 +94,7 @@ def train(model: BaseResNet18, data):
 
                 elif CONFIG.experiment in ['domain_generalization']:
                     (x1, y1), (x2, y2), (x3, y3) = batch
-                    print(x1.shape())
+                    print(x1.shape)
                     x1, y1 = x1.to(CONFIG.device), y1.to(CONFIG.device)
                     x2, y2 = x2.to(CONFIG.device), y2.to(CONFIG.device)
                     x3, y3 = x3.to(CONFIG.device), y3.to(CONFIG.device)
