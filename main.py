@@ -94,11 +94,13 @@ def train(model: BaseResNet18, data):
 
                 elif CONFIG.experiment in ['domain_generalization']:
                     (x1, y1), (x2, y2), (x3, y3) = batch
+                    print(x1.shape())
                     x1, y1 = x1.to(CONFIG.device), y1.to(CONFIG.device)
                     x2, y2 = x2.to(CONFIG.device), y2.to(CONFIG.device)
                     x3, y3 = x3.to(CONFIG.device), y3.to(CONFIG.device)
-                    x = torch.concat(x1, x2, x3)
-                    y = torch.concat(y1, y2, y3)
+                    x = torch.cat([x1, x2, x3])
+                    y = torch.cat([y1, y2, y3])
+
                     # Register forward hooks to record activation maps
                     hook_handles = []
                     hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(model.rec_actmaps_hook))
