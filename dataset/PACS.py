@@ -104,6 +104,11 @@ def load_data():
                 for i in range(len(example)):
                     example[i][1] = int(example[i][1])
                 source_examples.append(example)
+
+        # DEBUG
+        with open('source_domains.txt', 'w') as f:
+            for item in source_examples:
+                f.write(f'{item}')
             
         # Load target examples
         target_examples = load_domain(CONFIG.dataset_args['target_domain'])
