@@ -90,7 +90,7 @@ def load_data():
         for source_domain_path in CONFIG.dataset_args['source_domains']:
             source_domains_examples.append(load_domain(source_domain_path))
 
-        for label in range(2):
+        for label in range(CONFIG.num_classes):
             d1, d2, d3 = np.array(source_domains_examples[0]), np.array(source_domains_examples[1]), \
                             np.array(source_domains_examples[2])
             mask1, mask2, mask3 = d1[:, 1] == str(label), d2[:, 1] == str(label), d3[:, 1] == str(label)
