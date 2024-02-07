@@ -83,7 +83,7 @@ def load_data():
     elif CONFIG.experiment in ['domain_generalization']:
         source_domains_examples = []
         source_examples, target_examples = [], []
-        print(CONFIG.dataset_args['source_domains'])
+        #print(CONFIG.dataset_args['source_domains'])
         CONFIG.dataset_args['source_domains'] =  CONFIG.dataset_args['source_domains'].split()
 
         # Load source domains
@@ -106,9 +106,9 @@ def load_data():
                 source_examples.append(example)
 
         # DEBUG
-        with open('source_domains.txt', 'w') as f:
+        """ with open('source_domains.txt', 'w') as f:
             for item in source_examples:
-                f.write(f'{item}\n')
+                f.write(f'{item}\n') """
             
         # Load target examples
         target_examples = load_domain(CONFIG.dataset_args['target_domain'])
