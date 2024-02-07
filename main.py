@@ -61,13 +61,13 @@ def train(model: BaseResNet18, data):
     for epoch in range(cur_epoch, CONFIG.epochs):
         model.train()
 
-        print(f'EPOCH: {epoch}')
+        print(f'EPOCH: {epoch+1}')
 
         # Register forward hooks
         if CONFIG.experiment in ['random']:
             hook_handles = []
-            #hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU) 
-            hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(asm_hook))  
+            hook_handles = register_forward_hooks(model, asm_hook, nn.BatchNorm2d) 
+            #hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(asm_hook))  
         elif CONFIG.experiment in ['domain_adaptation']:
             hook_handles = []
             hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(model.rec_actmaps_hook))
@@ -102,12 +102,12 @@ def train(model: BaseResNet18, data):
 
                     # Register forward hooks to record activation maps
                     hook_handles = []
-                    hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(model.rec_actmaps_hook))
+                    hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.rec_actmaps_hook))
                     model.rec_actmaps(x1, x2, x3)
                     remove_forward_hooks(hook_handles)
                     hook_handles.clear()
                     # Register forward hooks to forward pass
-                    hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(model.asm_hook))
+                    hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.asm_hook))
                     loss = F.cross_entropy(model(x), y)
                     remove_forward_hooks(hook_handles)
 
@@ -122,11 +122,11 @@ def train(model: BaseResNet18, data):
         scheduler.step()
 
         # Detach hooks
-        if CONFIG.experiment in ['domain_adaptation']:
+        if CONFIG.experiment in ['random', 'domain_adaptation']:
             remove_forward_hooks(hook_handles)
         
         # Test current epoch
-        logging.info(f'[TEST @ Epoch={epoch}]')
+        logging.info(f'[TEST @ Epoch={epoch+1}]')
         evaluate(model, data['test'])
 
         # Save checkpoint
@@ -137,10 +137,6 @@ def train(model: BaseResNet18, data):
             'model': model.state_dict()
         }
         torch.save(checkpoint, os.path.join('record', CONFIG.experiment_name, 'last.pth'))
-
-        # Detach hooks
-        if CONFIG.experiment in ['random']:
-            remove_forward_hooks(hook_handles)
 
 
 def main():
