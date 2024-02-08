@@ -71,8 +71,8 @@ class DAResNet18(nn.Module):
                 print(f"asm_source_hook triggered for module: {module.__class__.__name__}")
                 print(f"actmaps length: {len(self.actmaps_target)}")
                 mask = self.actmaps_target.pop(0)
-                mask_bin = (mask > 0).float()
-                output_bin = (output > 0).float()
+                mask_bin = binarize(mask)
+                output_bin = binarize(output_bin)
                 output = output_bin * mask_bin
                 return output
             
