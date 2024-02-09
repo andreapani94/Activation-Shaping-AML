@@ -5,7 +5,7 @@ from torchvision.models import resnet18, ResNet18_Weights
 ratio = 1
 
 def binarize(tensor):
-    return torch.where(tensor > 0, torch.tensor(1), torch.tensor(0.1))
+    return torch.where(tensor > 0, torch.tensor(1), torch.tensor(0.0))
 
 def register_forward_hooks(model, hook, layer_type, skip_step=None):
     hook_handles = []
@@ -31,7 +31,7 @@ def asm_hook(module, input, output):
     mask = torch.bernoulli(p)
     mask_bin = binarize(mask)
     output_bin = binarize(mask)
-    return output_bin * mask_bin
+    return output * mask_bin
 
 class BaseResNet18(nn.Module):
     def __init__(self):
@@ -72,7 +72,7 @@ class DAResNet18(nn.Module):
                 print(f"actmaps length: {len(self.actmaps_target)}")
                 mask = self.actmaps_target.pop(0)
                 mask_bin = binarize(mask)
-                output_bin = binarize(output_bin)
+                output_bin = binarize(output)
                 output = output_bin * mask_bin
                 return output
             
