@@ -56,22 +56,22 @@ def train(model: BaseResNet18, data):
         scheduler.load_state_dict(checkpoint['scheduler'])
         model.load_state_dict(checkpoint['model'])
 
-    # Register forward hooks
-    if CONFIG.experiment in ['random']:
-        hook_handles = []
-        #hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU) 
-        hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(asm_hook))  
-    elif CONFIG.experiment in ['domain_adaptation']:
-        hook_handles = []
-        hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.rec_actmaps_hook))
-        hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.asm_source_hook))
-
     
     # Optimization loop
     for epoch in range(cur_epoch, CONFIG.epochs):
         model.train()
 
         print(f'EPOCH: {epoch+1}')
+
+        # Register forward hooks
+        if CONFIG.experiment in ['random']:
+            hook_handles = []
+            #hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU) 
+            hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(asm_hook))  
+        elif CONFIG.experiment in ['domain_adaptation']:
+            hook_handles = []
+            hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.rec_actmaps_hook))
+            hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.asm_source_hook))
         
         for batch_idx, batch in enumerate(tqdm(data['train'])):
             
