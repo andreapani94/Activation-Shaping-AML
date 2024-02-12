@@ -56,9 +56,10 @@ class DAResNet18(nn.Module):
         # unregister forward hooks
         if x_target is not None:
             self.forward_turn = 'target'
-            with torch.no_grad():
-                self.resnet(x_target)
+            self.eval()
+            self.resnet(x_target)
         self.forward_turn = 'source'
+        self.train()
         return self.resnet(x_source)
     
     def rec_actmaps_hook(self, module, input, output):
