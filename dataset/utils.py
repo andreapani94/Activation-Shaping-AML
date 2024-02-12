@@ -17,7 +17,6 @@ def target_random_sample(source_label, target_examples):
             break
     return target_index
 
-
 class BaseDataset(Dataset):
     def __init__(self, examples, transform):
         self.examples = examples
