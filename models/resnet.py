@@ -55,9 +55,9 @@ class DAResNet18(nn.Module):
         with torch.autocast(device_type=CONFIG.device, dtype=torch.float16, enabled=False):
             with torch.no_grad():
                 self.resnet(x_target)
+        self.train()
               
     def forward(self, x_source):
-        self.train()
         with torch.autocast(device_type=CONFIG.device, dtype=torch.float16, enabled=False):
             output = self.resnet(x_source)
         return output
