@@ -58,9 +58,7 @@ class DAResNet18(nn.Module):
         self.train()
               
     def forward(self, x_source):
-        with torch.autocast(device_type=CONFIG.device, dtype=torch.float16, enabled=False):
-            output = self.resnet(x_source)
-        return output
+        return self.resnet(x_source)
     
     def rec_actmaps_hook(self, module, input, output):
         if self.forward_turn == 'target':
