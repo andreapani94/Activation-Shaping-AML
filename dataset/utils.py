@@ -9,6 +9,14 @@ from PIL import Image
 
 from globals import CONFIG
 
+def target_random_sample(source_label, target_examples):
+    while True:
+        target_index = torch.randint(low=0, high=len(target_examples), size=(1,)).item()
+        _, target_label = target_examples[target_index]
+        if target_label == source_label:
+            break
+    return target_index
+
 
 class BaseDataset(Dataset):
     def __init__(self, examples, transform):
@@ -40,7 +48,7 @@ class DomainAdaptationDataset(Dataset):
         x_source = self.T(x_source).to(CONFIG.dtype)
         y_source = torch.tensor(y_source).long()
         # randomly sample from the target domain 
-        target_index = torch.randint(low=0, high=len(self.target_examples), size=(1,)).item()
+        target_index = target_random_sample(y_source, self.target_examples)
         x_target, _ = self.target_examples[target_index] # target is a tuple (path, 0)
         x_target = Image.open(x_target).convert('RGB')
         x_target = self.T(x_target).to(CONFIG.dtype)
