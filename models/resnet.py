@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torchvision.models import resnet18, ResNet18_Weights
+from globals import CONFIG
 
 ratio = 1
 
@@ -57,7 +58,9 @@ class DAResNet18(nn.Module):
         if x_target is not None:
             self.forward_turn = 'target'
             self.eval()
-            self.resnet(x_target)
+            with torch.autocast(device_type=CONFIG.device, dtype=torch.float16, enabled=False):
+                with torch.no_grad():
+                    self.resnet(x_target)
         self.forward_turn = 'source'
         self.train()
         return self.resnet(x_source)
