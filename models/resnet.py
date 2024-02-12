@@ -63,7 +63,7 @@ class DAResNet18(nn.Module):
     def rec_actmaps_hook(self, module, input, output):
         #print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
         #print(f"actmaps length: {len(self.actmaps_target)}")
-        self.actmaps_target.append(output.clone().detach())
+        self.actmaps_target.append(output.detach())
     
     def asm_source_hook(self, module, input, output):
         #print(f"asm_source_hook triggered for module: {module.__class__.__name__}")

@@ -69,9 +69,7 @@ def train(model: BaseResNet18, data):
             #hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU) 
             hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(asm_hook))  
         elif CONFIG.experiment in ['domain_adaptation']:
-            hook_handles = []
-            hook_handles = register_forward_hooks(model, model.rec_actmaps_hook, nn.ReLU, 2)
-            hook_handles = register_forward_hooks(model, model.asm_source_hook, nn.ReLU, 2)
+            pass
             #hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.rec_actmaps_hook))
             #hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(model.asm_source_hook))
         
@@ -92,8 +90,15 @@ def train(model: BaseResNet18, data):
                     x_source, y_source, x_target = batch
                     x_source, y_source, x_target = x_source.to(CONFIG.device), y_source.to(CONFIG.device), \
                                                     x_target.to(CONFIG.device)
+                    # register forward hooks, record activation maps and remove rec activation hook
+                    hook_handles = []
+                    hook_handles += register_forward_hooks(model, model.rec_actmaps_hook, nn.ReLU, 2)
                     model.record_activation_maps(x_target)
+                    remove_forward_hooks(hook_handles)
+                    # register forward hooks to multiply activation maps
+                    hook_handles += register_forward_hooks(model, model.asm_source_hook, nn.ReLU, 2)
                     loss = F.cross_entropy(model(x_source), y_source)
+                    remove_forward_hooks(hook_handles)
 
                 elif CONFIG.experiment in ['domain_generalization']:
                     (x1, y1), (x2, y2), (x3, y3) = batch
