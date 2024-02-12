@@ -90,7 +90,8 @@ def train(model: BaseResNet18, data):
                     x_source, y_source, x_target = batch
                     x_source, y_source, x_target = x_source.to(CONFIG.device), y_source.to(CONFIG.device), \
                                                     x_target.to(CONFIG.device)
-                    loss = F.cross_entropy(model(x_source, x_target), y_source)
+                    model.record_activation_maps(x_target)
+                    loss = F.cross_entropy(model(x_source), y_source)
 
                 elif CONFIG.experiment in ['domain_generalization']:
                     (x1, y1), (x2, y2), (x3, y3) = batch

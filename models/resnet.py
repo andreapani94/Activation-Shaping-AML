@@ -49,19 +49,14 @@ class DAResNet18(nn.Module):
         self.resnet = resnet18(weights=ResNet18_Weights)
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, 7)
         self.actmaps_target = []
-        self.forward_turn = 'target'
 
-    def forward(self, x_source, x_target=None):
-        # unregister other forward hooks
-        # register forward hooks
-        # unregister forward hooks
-        if x_target is not None:
-            self.forward_turn = 'target'
-            self.eval()
-            with torch.autocast(device_type=CONFIG.device, dtype=torch.float16, enabled=False):
-                with torch.no_grad():
-                    self.resnet(x_target)
-        self.forward_turn = 'source'
+    def record_activation_maps(self, x_target):
+        self.eval()
+        with torch.autocast(device_type=CONFIG.device, dtype=torch.float16, enabled=False):
+            with torch.no_grad():
+                self.resnet(x_target)
+              
+    def forward(self, x_source):
         self.train()
         with torch.autocast(device_type=CONFIG.device, dtype=torch.float16, enabled=False):
             output = self.resnet(x_source)
