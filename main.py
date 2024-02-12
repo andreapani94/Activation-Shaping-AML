@@ -70,7 +70,8 @@ def train(model: BaseResNet18, data):
             hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(asm_hook))  
         elif CONFIG.experiment in ['domain_adaptation']:
             hook_handles = []
-            hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU, 2)
+            hook_handles = register_forward_hooks(model, model.rec_actmaps_hook, nn.ReLU, 2)
+            hook_handles = register_forward_hooks(model, model.asm_source_hook, nn.ReLU, 2)
             #hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.rec_actmaps_hook))
             #hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(model.asm_source_hook))
         
