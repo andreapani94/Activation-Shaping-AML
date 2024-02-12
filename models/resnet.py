@@ -61,20 +61,18 @@ class DAResNet18(nn.Module):
         return self.resnet(x_source)
     
     def rec_actmaps_hook(self, module, input, output):
-        if self.forward_turn == 'target':
-            print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
-            print(f"actmaps length: {len(self.actmaps_target)}")
-            self.actmaps_target.append(output.clone().detach())
+        #print(f"rec_actmaps_hook triggered for module: {module.__class__.__name__}")
+        #print(f"actmaps length: {len(self.actmaps_target)}")
+        self.actmaps_target.append(output.clone().detach())
     
     def asm_source_hook(self, module, input, output):
-            if self.forward_turn == 'source':
-                print(f"asm_source_hook triggered for module: {module.__class__.__name__}")
-                print(f"actmaps length: {len(self.actmaps_target)}")
-                mask = self.actmaps_target.pop(0)
-                mask_bin = binarize(mask)
-                output_bin = binarize(output)
-                output = output_bin * mask_bin
-                return output
+        #print(f"asm_source_hook triggered for module: {module.__class__.__name__}")
+        #print(f"actmaps length: {len(self.actmaps_target)}")
+        mask = self.actmaps_target.pop(0)
+        mask_bin = binarize(mask)
+        output_bin = binarize(output)
+        output = output_bin * mask_bin
+        return output
             
 class DGResNet18(nn.Module):
     def __init__(self):
