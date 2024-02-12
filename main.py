@@ -92,11 +92,13 @@ def train(model: BaseResNet18, data):
                                                     x_target.to(CONFIG.device)
                     # register forward hooks, record activation maps and remove rec activation hook
                     hook_handles = []
-                    hook_handles += register_forward_hooks(model, model.rec_actmaps_hook, nn.ReLU, 2)
+                    #hook_handles += register_forward_hooks(model, model.rec_actmaps_hook, nn.ReLU, 2)
+                    hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(model.rec_actmaps_hook))
                     model.record_activation_maps(x_target)
                     remove_forward_hooks(hook_handles)
                     # register forward hooks to multiply activation maps
-                    hook_handles += register_forward_hooks(model, model.asm_source_hook, nn.ReLU, 2)
+                    #hook_handles += register_forward_hooks(model, model.asm_source_hook, nn.ReLU, 2)
+                    hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(model.asm_source_hook))
                     loss = F.cross_entropy(model(x_source), y_source)
                     remove_forward_hooks(hook_handles)
 

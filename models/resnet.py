@@ -19,7 +19,7 @@ def register_forward_hooks(model, hook, layer_type, skip_step=None):
                 if layer_count % skip_step == 0:
                     hook_handles.append(layer.register_forward_hook(hook))
                 layer_count += 1
-    print(f'Registered {len(hook_handles)} forward hooks to {layer_type}')
+    #print(f'Registered {len(hook_handles)} forward hooks to {layer_type}')
     return hook_handles
 
 def remove_forward_hooks(hook_handles):
