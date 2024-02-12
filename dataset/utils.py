@@ -9,6 +9,7 @@ from PIL import Image
 
 from globals import CONFIG
 
+"""
 def target_random_sample(source_label, target_examples):
     while True:
         target_index = torch.randint(low=0, high=len(target_examples), size=(1,)).item()
@@ -16,6 +17,7 @@ def target_random_sample(source_label, target_examples):
         if target_label == source_label:
             break
     return target_index
+"""
 
 class BaseDataset(Dataset):
     def __init__(self, examples, transform):

@@ -88,12 +88,16 @@ class DGResNet18(nn.Module):
         return self.resnet(x)
 
     def rec_actmaps(self, x1, x2, x3):
-        self.rec_turn = 1
-        self.resnet(x1)
-        self.rec_turn = 2
-        self.resnet(x2)
-        self.rec_turn = 3
-        self.resnet(x3)
+        self.eval()
+        with torch.autocast(device_type=CONFIG.device, dtype=torch.float16, enabled=False):
+            with torch.no_grad():
+                self.rec_turn = 1
+                self.resnet(x1)
+                self.rec_turn = 2
+                self.resnet(x2)
+                self.rec_turn = 3
+                self.resnet(x3)      
+        self.train()
 
     def rec_actmaps_hook(self, module, input, output):
         if self.rec_turn == 1:
