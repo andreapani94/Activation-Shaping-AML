@@ -84,7 +84,7 @@ def load_data():
         source_domains_examples = []
         source_examples, target_examples = [], []
         print(f"Source domains: {CONFIG.dataset_args['source_domains']}")
-        print(f"Source domains: {CONFIG.dataset_args['target_domain']}")
+        print(f"Target domain: {CONFIG.dataset_args['target_domain']}")
         CONFIG.dataset_args['source_domains'] =  CONFIG.dataset_args['source_domains'].split()
 
         # Load source domains
