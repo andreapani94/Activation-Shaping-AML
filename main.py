@@ -109,6 +109,7 @@ def train(model: BaseResNet18, data):
                     x3, y3 = x3.to(CONFIG.device), y3.to(CONFIG.device)
                     x = torch.cat([x1, x2, x3])
                     y = torch.cat([y1, y2, y3])
+                    print(f'X shape is: {x.shape()}')
 
                     # Register forward hooks to record activation maps
                     hook_handles = []
