@@ -111,10 +111,10 @@ class DGResNet18(nn.Module):
         mask1 = (self.actmaps1.pop(0) > 0).float()
         mask2 = (self.actmaps2.pop(0) > 0).float()
         mask3 = (self.actmaps3.pop(0) > 0).float()
-        print(f'M1 shape is: {mask1.shape()}')
+        print(f'M1 shape is: {mask1.shape}')
         output_bin = (output > 0).float()
         mask = torch.cat((mask1, mask2, mask3))
-        print(f'M shape is: {mask.shape()}')
+        print(f'M shape is: {mask.shape}')
         return mask * output_bin
 
 
