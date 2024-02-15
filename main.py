@@ -67,10 +67,6 @@ def train(model: BaseResNet18, data):
             hook_handles = []
             #hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU) 
             hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(asm_hook))  
-        elif CONFIG.experiment in ['domain_adaptation']:
-            pass
-            #hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.rec_actmaps_hook))
-            #hook_handles.append(model.resnet.layer1[0].relu.register_forward_hook(model.asm_source_hook))
         
         for batch_idx, batch in enumerate(tqdm(data['train'])):
             
@@ -127,7 +123,7 @@ def train(model: BaseResNet18, data):
         scheduler.step()
 
         # Detach hooks
-        if CONFIG.experiment in ['random', 'domain_adaptation']:
+        if CONFIG.experiment in ['random']:
             remove_forward_hooks(hook_handles)
         
         # Test current epoch
