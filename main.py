@@ -13,7 +13,6 @@ from parse_args import parse_arguments
 
 from dataset import PACS
 from models.resnet import BaseResNet18, DAResNet18, DGResNet18
-# 1. Activation Shaping Module
 from models.resnet import asm_hook
 from models.resnet import register_forward_hooks, remove_forward_hooks
 
@@ -83,9 +82,6 @@ def train(model: BaseResNet18, data):
                     x, y = x.to(CONFIG.device), y.to(CONFIG.device)
                     loss = F.cross_entropy(model(x), y)
 
-                ######################################################
-                #elif... TODO: Add here train logic for the other experiments
-                ######################################################
                 elif CONFIG.experiment in ['domain_adaptation']:
                     x_source, y_source, x_target = batch
                     x_source, y_source, x_target = x_source.to(CONFIG.device), y_source.to(CONFIG.device), \
@@ -112,11 +108,11 @@ def train(model: BaseResNet18, data):
 
                     # Register forward hooks to record activation maps
                     hook_handles = []
-                    hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.rec_actmaps_hook))
+                    hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(model.rec_actmaps_hook))
                     model.rec_actmaps(x1, x2, x3)
                     remove_forward_hooks(hook_handles)
                     # Register forward hooks to forward pass
-                    hook_handles.append(model.resnet.layer1[0].bn1.register_forward_hook(model.asm_hook))
+                    hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(model.asm_hook))
                     loss = F.cross_entropy(model(x), y)
                     remove_forward_hooks(hook_handles)
 
@@ -156,12 +152,6 @@ def main():
     # Load model
     if CONFIG.experiment in ['baseline', 'random']:
         model = BaseResNet18()
-
-    ######################################################
-    #elif... TODO: Add here model loading for the other experiments (eg. DA and optionally DG)
-
-    ######################################################
-        
     elif CONFIG.experiment in ['domain_adaptation']:
         model = DAResNet18()
     elif CONFIG.experiment in ['domain_generalization']:
