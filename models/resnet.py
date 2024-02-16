@@ -25,6 +25,7 @@ def register_forward_hooks(model, hook, layer_type, skip_step=None):
 def remove_forward_hooks(hook_handles):
     for hook in hook_handles:
         hook.remove()
+    hook_handles.clear()
 
 def asm_hook(module, input, output):
     print(f"Activation hook triggered for module: {module.__class__.__name__}")
