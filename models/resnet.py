@@ -3,7 +3,7 @@ import torch.nn as nn
 from torchvision.models import resnet18, ResNet18_Weights
 from globals import CONFIG
 
-ratio = 0.85
+ratio = 0.75
 
 def binarize(tensor):
     return torch.where(tensor > 0, torch.tensor(1), torch.tensor(0.2))
@@ -33,7 +33,7 @@ def asm_hook(module, input, output):
     mask = torch.bernoulli(p)
     mask_bin = binarize(mask)
     output_bin = binarize(mask)
-    return output_bin * mask_bin
+    return output * mask_bin
 
 class BaseResNet18(nn.Module):
     def __init__(self):

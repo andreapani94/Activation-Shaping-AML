@@ -66,7 +66,7 @@ def train(model: BaseResNet18, data):
         if CONFIG.experiment in ['random']:
             hook_handles = []
             #hook_handles = register_forward_hooks(model, asm_hook, nn.ReLU) 
-            hook_handles.append(model.resnet.layer1[0].conv1.register_forward_hook(asm_hook))  
+            hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(asm_hook))  
         
         for batch_idx, batch in enumerate(tqdm(data['train'])):
             
