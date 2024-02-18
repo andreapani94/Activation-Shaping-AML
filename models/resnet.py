@@ -113,7 +113,6 @@ class DGResNet18(nn.Module):
         mask2 = binarize(self.actmaps2.pop(0))
         mask3 = binarize(self.actmaps3.pop(0))
         output_bin = binarize(output)
-        #mask = torch.cat((mask1, mask2, mask3))
         mask = (mask1 * mask2 * mask3).repeat((3, 1, 1, 1))
         return mask * output_bin
 
