@@ -6,7 +6,7 @@ from globals import CONFIG
 ratio = 0.75
 
 def binarize(tensor):
-    return torch.where(tensor > 0, torch.tensor(1), torch.tensor(0.2))
+    return torch.where(tensor > 0, torch.tensor(1), torch.tensor(0.0))
 
 def register_forward_hooks(model, hook, layer_type, skip_step=None):
     hook_handles = []
@@ -115,26 +115,3 @@ class DGResNet18(nn.Module):
         output_bin = binarize(output)
         mask = (mask1 * mask2 * mask3).repeat((3, 1, 1, 1))
         return mask * output_bin
-
-
-
-######################################################
-# TODO: either define the Activation Shaping Module as a nn.Module
-#class ActivationShapingModule(nn.Module):
-#...
-#
-# OR as a function that shall be hooked via 'register_forward_hook'
-#def activation_shaping_hook(module, input, output):
-#...
-#
-######################################################
-# TODO: modify 'BaseResNet18' including the Activation Shaping Module
-#class ASHResNet18(nn.Module):
-#    def __init__(self):
-#        super(ASHResNet18, self).__init__()
-#        ...
-#    
-#    def forward(self, x):
-#        ...
-#
-######################################################
