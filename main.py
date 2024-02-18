@@ -104,12 +104,12 @@ def train(model: BaseResNet18, data):
 
                     # Register forward hooks to record activation maps
                     hook_handles = []
-                    hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(model.rec_actmaps_hook))
+                    hook_handles.append(model.resnet.layer4[0].bn1.register_forward_hook(model.rec_actmaps_hook))
                     model.rec_actmaps(x1, x2, x3)
                     remove_forward_hooks(hook_handles)
                     hook_handles.clear()
                     # Register forward hooks to forward pass
-                    hook_handles.append(model.resnet.layer4[0].relu.register_forward_hook(model.asm_hook))
+                    hook_handles.append(model.resnet.layer4[0].bn1.register_forward_hook(model.asm_hook))
                     loss = F.cross_entropy(model(x), y)
                     remove_forward_hooks(hook_handles)
                     hook_handles.clear()

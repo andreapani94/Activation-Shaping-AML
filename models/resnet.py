@@ -109,10 +109,10 @@ class DGResNet18(nn.Module):
             self.actmaps3.append(output.detach())
     
     def asm_hook(self, module, input, output):
-        mask1 = (self.actmaps1.pop(0) > 0).float()
-        mask2 = (self.actmaps2.pop(0) > 0).float()
-        mask3 = (self.actmaps3.pop(0) > 0).float()
-        output_bin = (output > 0).float()
+        mask1 = binarize(self.actmaps1.pop(0))
+        mask2 = binarize(self.actmaps2.pop(0))
+        mask3 = binarize(self.actmaps3.pop(0))
+        output_bin = binarize(output)
         #mask = torch.cat((mask1, mask2, mask3))
         mask = (mask1 * mask2 * mask3).repeat((3, 1, 1, 1))
         return mask * output_bin
